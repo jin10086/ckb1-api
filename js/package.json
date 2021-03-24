@@ -1,0 +1,16 @@
+{
+  "name": "js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "susd.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node susd.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ckb-lumos/indexer": "^0.16.0",
+    "@nervosnetwork/ckb-sdk-core": "^0.40.0"
+  }
+}
