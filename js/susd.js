@@ -214,6 +214,7 @@ class SudtAccount {
     for (const cell of availableCells) {
       inputs.push(cell)
       sumSudt += cell.sudt
+      continue
       if (amount <= sumSudt) {
         /* eslint-disable-next-line */
         continue
