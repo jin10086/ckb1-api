@@ -89,9 +89,9 @@ const CONSTANT = {
 class SudtAccount {
   constructor(privateKey = CONFIG.privateKey, ckbUrl = CONFIG.ckbUrl) {
     this.ckb = new CKB(ckbUrl)
-    const uri = "https://testnet.ckb.dev";
-    // this.indexer = new Indexer(uri, path.join('/Users/gaojin/Documents/GitHub/ckb-api/js', CONFIG.lumosDbName),{ rpcOptions: { agent: agent(new URL(uri))}});
-    // this.indexer.startForever()
+    const uri = "http://localhost:8114";
+    this.indexer = new Indexer(uri, path.join('.', CONFIG.lumosDbName),{ rpcOptions: { agent: agent(new URL(uri))}});
+    this.indexer.startForever()
 
 
     const publicKey = this.ckb.utils.privateKeyToPublicKey(privateKey)
@@ -264,8 +264,9 @@ const run = async () => {
   const account = new SudtAccount()
   await account.getReady()
 
-  const cells = await getCells(account.sender.lock,'lock')
-  console.log(cells)
+  const cells = await account.getCells()
+  // const cells = await getCells(account.sender.lock,'lock')
+  // console.log(cells)
 
   /* issue sudt */
   const txHash = await account.issue(2000000n * BigInt(10 ** 8),cells)
