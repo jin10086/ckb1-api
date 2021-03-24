@@ -28,8 +28,8 @@ const agent = function(_parsedURL) {
 }
 
 const CONFIG = {
-  privateKey: "",
-  ckbUrl: 'https://testnet.ckb.dev/rpc',
+  privateKey: process.env.PRIVATE_KEY,
+  ckbUrl: process.env.CKB_URL || 'http://localhost:8114',
   lumosDbName: 'testnet_lomus_db',
   sudtDep: {
     codeHash: SIMPLE_UDT.codeHash,
