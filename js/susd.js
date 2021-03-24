@@ -4,6 +4,8 @@ const os = require('os')
 const http = require('http')
 const https = require('https')
 const fetch = require('node-fetch')
+import { getTransactionSize, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+
 
 /* eslint-disable-next-line */
 const { Indexer, CellCollector } = require('@ckb-lumos/indexer')
@@ -264,7 +266,6 @@ const run = async () => {
   await account.getReady()
 
   const cells = await account.getCells()
-  // const cells = await getCells(account.sender.lock,'lock')
   console.log(cells)
 
   /* issue sudt */
@@ -275,14 +276,17 @@ const run = async () => {
   const sudtCells = await account.getSudtCells()
   console.log(sudtCells)
 
+  const toAddress = "ckt1qyqd5eyygtdmwdr7ge736zw6z0ju6wsw7rssu8fcve";
+  const receiverLockScript = addressToScript(toAddress)
+  console.log("to:",receiverLockScript)
   /* transfer */
-const receiverCell = cells.find(cell => !cell.type && cell.data === '0x')
-if (!receiverCell) {
-  throw new Error('Please add a secp256k1 cell to receive sudt')
-}
-console.log("receiverCell:",receiverCell);
-const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), "")
-console.log(txHash)
+// const receiverCell = cells.find(cell => !cell.type && cell.data === '0x')
+// if (!receiverCell) {
+//   throw new Error('Please add a secp256k1 cell to receive sudt')
+// }
+// console.log("receiverCell:",receiverCell);
+// const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), "")
+// console.log(txHash)
 }
 
 run()
