@@ -269,12 +269,12 @@ const run = async () => {
   console.log(cells)
 
   /* issue sudt */
-  const txHash = await account.issue(2000000n * BigInt(10 ** 8),cells)
-  console.log(txHash)
+  // const txHash = await account.issue(2000000n * BigInt(10 ** 8),cells)
+  // console.log(txHash)
 
 //   /* get sudt cells */
-  // const sudtCells = await account.getSudtCells()
-  // console.log(sudtCells)
+  const sudtCells = await account.getSudtCells()
+  console.log(sudtCells)
 
   /* transfer */
 // const receiverCell = cells.find(cell => !cell.type && cell.data === '0x')
