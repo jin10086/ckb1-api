@@ -91,7 +91,7 @@ class SudtAccount {
     this.ckb = new CKB(ckbUrl)
     const uri = "http://localhost:8114";
     this.indexer = new Indexer(uri, path.join('.', CONFIG.lumosDbName),{ rpcOptions: { agent: agent(new URL(uri))}});
-    // this.indexer.startForever()
+    this.indexer.startForever()
 
 
     const publicKey = this.ckb.utils.privateKeyToPublicKey(privateKey)
