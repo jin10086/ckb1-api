@@ -176,15 +176,14 @@ class SudtAccount {
     return this.ckb.rpc.sendTransaction(signedTx)
   }
 
-  issue = async (amount,cells) => {
+  issue = async (amount) => {
     const address = this.ckb.utils.privateKeyToAddress(this.sender.privateKey, { prefix: 'ckt' })
     const rawTx = this.ckb.generateRawTransaction({
       fromAddress: address,
       toAddress: address,
       capacity: CONSTANT.sudtCellSize,
       fee: 100000n,
-      cells: cells,
-      // cells: this.ckb.cells.get(this.ckb.utils.scriptToHash(this.sender.lock)),
+      cells: this.ckb.cells.get(this.ckb.utils.scriptToHash(this.sender.lock)),
       deps: [this.ckb.config.secp256k1Dep, CONFIG.sudtDep],
     })
 
@@ -269,7 +268,7 @@ const run = async () => {
   console.log(cells)
 
   /* issue sudt */
-  // const txHash = await account.issue(2000000n * BigInt(10 ** 8),cells)
+  // const txHash = await account.issue(2000000n * BigInt(10 ** 8))
   // console.log(txHash)
 
 //   /* get sudt cells */
@@ -277,12 +276,12 @@ const run = async () => {
   console.log(sudtCells)
 
   /* transfer */
-// const receiverCell = cells.find(cell => !cell.type && cell.data === '0x')
-// if (!receiverCell) {
-//   throw new Error('Please add a secp256k1 cell to receive sudt')
-// }
-// console.log("receiverCell:",receiverCell);
-const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), "ckt1qyqd5eyygtdmwdr7ge736zw6z0ju6wsw7rssu8fcve")
+const receiverCell = cells.find(cell => !cell.type && cell.data === '0x')
+if (!receiverCell) {
+  throw new Error('Please add a secp256k1 cell to receive sudt')
+}
+console.log("receiverCell:",receiverCell);
+const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), "")
 console.log(txHash)
 }
 
