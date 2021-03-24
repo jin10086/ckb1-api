@@ -4,7 +4,7 @@ const os = require('os')
 const http = require('http')
 const https = require('https')
 const fetch = require('node-fetch')
-import { getTransactionSize, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+const { getTransactionSize, addressToScript } = require('@nervosnetwork/ckb-sdk-utils')
 
 
 /* eslint-disable-next-line */
