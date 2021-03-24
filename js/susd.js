@@ -285,8 +285,8 @@ const run = async () => {
 //   throw new Error('Please add a secp256k1 cell to receive sudt')
 // }
 // console.log("receiverCell:",receiverCell);
-// const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), "")
-// console.log(txHash)
+const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), receiverLockScript)
+console.log(txHash)
 }
 
 run()
