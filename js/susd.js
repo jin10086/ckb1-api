@@ -266,7 +266,7 @@ const run = async () => {
 
   const cells = await account.getCells()
   // const cells = await getCells(account.sender.lock,'lock')
-  // console.log(cells)
+  console.log(cells)
 
   /* issue sudt */
   const txHash = await account.issue(2000000n * BigInt(10 ** 8),cells)
