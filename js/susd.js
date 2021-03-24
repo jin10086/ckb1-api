@@ -293,7 +293,7 @@ const run = async () => {
   }
   console.log("receiverCell:",receiverCell);
 
-  const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), receiverLockScript)
+  const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), receiverCell)
   console.log(txHash)
 }
 
