@@ -277,13 +277,13 @@ const run = async () => {
   console.log(sudtCells)
 
   /* transfer */
-const receiverCell = cells.find(cell => !cell.type && cell.data === '0x')
-if (!receiverCell) {
-  throw new Error('Please add a secp256k1 cell to receive sudt')
-}
-console.log("receiverCell:",receiverCell);
-// const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), receiverCell)
-// console.log(txHash)
+// const receiverCell = cells.find(cell => !cell.type && cell.data === '0x')
+// if (!receiverCell) {
+//   throw new Error('Please add a secp256k1 cell to receive sudt')
+// }
+// console.log("receiverCell:",receiverCell);
+const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), "ckt1qyqd5eyygtdmwdr7ge736zw6z0ju6wsw7rssu8fcve")
+console.log(txHash)
 }
 
 run()
