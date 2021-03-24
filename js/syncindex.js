@@ -91,7 +91,7 @@ class SudtAccount {
     this.ckb = new CKB(ckbUrl)
     const uri = "http://localhost:8114";
     this.indexer = new Indexer(uri, path.join('.', CONFIG.lumosDbName),{ rpcOptions: { agent: agent(new URL(uri))}});
-    // this.indexer.startForever()
+    this.indexer.startForever()
 
 
     const publicKey = this.ckb.utils.privateKeyToPublicKey(privateKey)
@@ -264,13 +264,13 @@ const run = async () => {
   const account = new SudtAccount()
   await account.getReady()
 
-  const cells = await account.getCells()
+  // const cells = await account.getCells()
   // const cells = await getCells(account.sender.lock,'lock')
   // console.log(cells)
 
   /* issue sudt */
-  const txHash = await account.issue(2000000n * BigInt(10 ** 8),cells)
-  console.log(txHash)
+  // const txHash = await account.issue(2000000n * BigInt(10 ** 8),cells)
+  // console.log(txHash)
 
 //   /* get sudt cells */
   // const sudtCells = await account.getSudtCells()
