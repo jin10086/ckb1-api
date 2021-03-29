@@ -257,7 +257,7 @@ class SudtAccount {
     /**
      * NOTICE: 这里把实际收款人的 lock 放到交易的 output 中, 在原用例中是交易发起人接收这个 cell, 在这个例子中是 to address 接收这个 cell
      */
-    const toLock = this.ckb.addressToScript(toAddress)
+    const toLock = addressToScript(toAddress)
     rawTx.outputs.push({
       lock: toLock,
       capacity: `0x${(BigInt(receiverCell.capacity) - fee).toString(16)}`,
