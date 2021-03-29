@@ -294,13 +294,13 @@ const run = async () => {
   /**
    * NOTICE: 这里的 receive cell 通过发交易的人的 lock 去找, 因为发交易的人提供收款的 cell
    */
-  const allreceiverCell = await account.getOtherCells(account.sender.lock)
+  const allreceiverCell = account.getCells();
 
   /* transfer */
   const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x')
-  if (!receiverCell) {
-    throw new Error('Please add a secp256k1 cell to receive sudt')
-  }
+  // if (!receiverCell) {
+  //   throw new Error('Please add a secp256k1 cell to receive sudt')
+  // }
   console.log("receiverCell:",receiverCell);
 
   /**
