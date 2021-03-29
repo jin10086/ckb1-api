@@ -280,7 +280,7 @@ const run = async () => {
   const sudtCells = await account.getSudtCells()
   console.log(sudtCells)
 
-  const toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
+  const toAddress = "ckb1qyp86qjjkcs27f62l9g72d8pstr62l0cdkns2y4s0u";
   const receiverLockScript = addressToScript(toAddress)
   console.log("receiverLockScript:",receiverLockScript)
 
