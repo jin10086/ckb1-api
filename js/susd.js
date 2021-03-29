@@ -15,10 +15,10 @@ const CKB = require('@nervosnetwork/ckb-sdk-core').default
 const CKB_NODE_INDEXER = "https://testnet.ckb.dev/indexer"
 
 const httpAgent = new http.Agent({
-	keepAlive: true
+ keepAlive: true
 });
 const httpsAgent = new https.Agent({
-	keepAlive: true
+ keepAlive: true
 });
 
 const agent = function(_parsedURL) {
@@ -206,7 +206,10 @@ class SudtAccount {
     return this.ckb.rpc.sendTransaction(signedTx)
   }
 
-  transfer = async (tokenId, amount, receiverCell) => {
+  /**
+   * NOTICE: 这里多加一个 to address 参数, 用于表示实际收款人地址, receive cell 保持原样, 是交易发起人免费提供给收款人的 cell
+   */
+  transfer = async (tokenId, amount, receiverCell, toAddress) => {
     const availableCells = await this.getSudtCells(tokenId)
     const inputs = []
     let sumSudt = 0n
@@ -251,8 +254,12 @@ class SudtAccount {
       previousOutput: receiverCell.outPoint,
       since: '0x0',
     })
+    /**
+     * NOTICE: 这里把实际收款人的 lock 放到交易的 output 中, 在原用例中是交易发起人接收这个 cell, 在这个例子中是 to address 接收这个 cell
+     */
+    const toLock = this.ckb.addressToScript(toAddress)
     rawTx.outputs.push({
-      lock: this.sender.lock,
+      lock: toLock,
       capacity: `0x${(BigInt(receiverCell.capacity) - fee).toString(16)}`,
       type: sudtTypeScript,
     })
@@ -280,20 +287,26 @@ const run = async () => {
   const sudtCells = await account.getSudtCells()
   console.log(sudtCells)
 
-  const toAddress = "ckb1qyp86qjjkcs27f62l9g72d8pstr62l0cdkns2y4s0u";
+  const toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
   const receiverLockScript = addressToScript(toAddress)
   console.log("receiverLockScript:",receiverLockScript)
 
-  const allreceiverCell = await account.getOtherCells(receiverLockScript)
+  /**
+   * NOTICE: 这里的 receive cell 通过发交易的人的 lock 去找, 因为发交易的人提供收款的 cell
+   */
+  const allreceiverCell = await account.getOtherCells(account.sender.lock)
 
   /* transfer */
   const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x')
-  // if (!receiverCell) {
-  //   throw new Error('Please add a secp256k1 cell to receive sudt')
-  // }
+  if (!receiverCell) {
+    throw new Error('Please add a secp256k1 cell to receive sudt')
+  }
   console.log("receiverCell:",receiverCell);
 
-  const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), receiverCell)
+  /**
+   * NOTICE: 这里多传一个 to address 参数, 用于表示实际的收款人地址, receive cell 保留原样, 是交易发起人免费提供给收款人的 cell
+   */
+  const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), receiverCell, toAddress)
   console.log(txHash)
 }
 
