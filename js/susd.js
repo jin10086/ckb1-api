@@ -252,7 +252,7 @@ class SudtAccount {
       since: '0x0',
     })
     rawTx.outputs.push({
-      lock: receiverCell.lock,
+      lock: this.sender.lock,
       capacity: `0x${(BigInt(receiverCell.capacity) - fee).toString(16)}`,
       type: sudtTypeScript,
     })
