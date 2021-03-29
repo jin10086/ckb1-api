@@ -288,10 +288,10 @@ const run = async () => {
 
   /* transfer */
   const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x')
-  if (!receiverCell) {
-    throw new Error('Please add a secp256k1 cell to receive sudt')
-  }
-  console.log("receiverCell:",receiverCell);
+  // if (!receiverCell) {
+  //   throw new Error('Please add a secp256k1 cell to receive sudt')
+  // }
+  // console.log("receiverCell:",receiverCell);
 
   const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), receiverCell)
   console.log(txHash)
