@@ -4,6 +4,8 @@ const os = require('os')
 const http = require('http')
 const https = require('https')
 const fetch = require('node-fetch')
+const express = require('express')
+
 const { getTransactionSize, addressToScript } = require('@nervosnetwork/ckb-sdk-utils')
 
 
@@ -282,12 +284,12 @@ class SudtAccount {
 
 module.exports = SudtAccount
 
-const run = async () => {
-  const account = new SudtAccount()
-  await account.getReady()
+const account = new SudtAccount()
+account.getReady()
 
+const run = async (toAddress,sendAmount) => {
   const cells = await account.getCells()
-  console.log(cells)
+  // console.log(cells)
 
   /* issue sudt */
   // const txHash = await account.issue(2000000n * BigInt(10 ** 8))
@@ -295,16 +297,17 @@ const run = async () => {
 
 //   /* get sudt cells */
   const sudtCells = await account.getSudtCells()
-  console.log(sudtCells)
+  // console.log(sudtCells)
 
-  const toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
+  // const toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
   const receiverLockScript = addressToScript(toAddress)
-  console.log("receiverLockScript:",receiverLockScript)
+  // console.log("receiverLockScript:",receiverLockScript)
 
   /**
    * NOTICE: 这里的 receive cell 通过发交易的人的 lock 去找, 因为发交易的人提供收款的 cell
    */
   const allreceiverCell = await account.getCells();
+  // console.log(allreceiverCell);
 
   /* transfer */
   const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x')
@@ -316,8 +319,28 @@ const run = async () => {
   /**
    * NOTICE: 这里多传一个 to address 参数, 用于表示实际的收款人地址, receive cell 保留原样, 是交易发起人免费提供给收款人的 cell
    */
-  const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), receiverCell, toAddress)
-  console.log(txHash)
+  const txHash = await account.transfer(null, BigInt(sendAmount) * BigInt(10 ** 8), receiverCell, toAddress)
+  return txHash;
 }
 
-run()
+var app = express()
+
+app.set('port', (process.env.PORT || 5000))
+
+app.get('/ckbsend', function (req, res) {
+    let toAddress = req.query.toAddress;
+    let sendAmount = req.query.sendAmount;
+    let txhash ="";
+    try {
+      txhash = run(toAddress,sendAmount);
+    } catch (e) {
+
+    }
+    res.send({
+        "txhash": txhash
+    })
+})
+
+app.listen(app.get('port'), function () {
+    console.log("Node app is running at localhost:" + app.get('port'))
+})

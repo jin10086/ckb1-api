@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@ckb-lumos/indexer": "^0.16.0",
-    "@nervosnetwork/ckb-sdk-core": "^0.40.0"
+    "@nervosnetwork/ckb-sdk-core": "^0.40.0",
+    "express": "^4.17.1"
   }
 }
