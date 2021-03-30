@@ -57,8 +57,8 @@ class CKBApi(Resource):
         name = args["name"]
         checktoken = args["checktoken"]
 
-        if not verifyToken(checktoken, address, name):
-            return {{"status": 0, "msg": "参数校验失败."}}
+        # if not verifyToken(checktoken, address, name):
+        #     return {{"status": 0, "msg": "参数校验失败."}}
         user = mongo.db.users.find_one({"address": address})
         if user:
             return {"status": 0, "msg": "代币已经发过了."}
@@ -73,4 +73,4 @@ class CKBApi(Resource):
 api.add_resource(CKBApi, "/address/<string:address>")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,port=8000)
