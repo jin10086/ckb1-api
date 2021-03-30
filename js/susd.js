@@ -327,23 +327,22 @@ class SudtAccount {
 // module.exports = SudtAccount
 
 
-const run = async (toAddress, sendAmount) => {
+const run = async () => {
   const account = new SudtAccount()
   await account.getReady()
-  const cells = await account.getCells()
 
-  sendAmount = BigInt(sendAmount) * BigInt(10 ** 8);
-  // console.log(cells)
+  const cells = await account.getCells()
+  console.log(cells)
 
   /* issue sudt */
   // const txHash = await account.issue(2000000n * BigInt(10 ** 8))
   // console.log(txHash)
 
-  //   /* get sudt cells */
+//   /* get sudt cells */
   const sudtCells = await account.getSudtCells()
-  // console.log(sudtCells)
+  console.log(sudtCells)
 
-  toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
+  const toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
   const receiverLockScript = addressToScript(toAddress)
   // console.log("receiverLockScript:",receiverLockScript)
 
@@ -351,22 +350,22 @@ const run = async (toAddress, sendAmount) => {
    * NOTICE: 这里的 receive cell 通过发交易的人的 lock 去找, 因为发交易的人提供收款的 cell
    */
   const allreceiverCell = await account.getCells();
-  // console.log(allreceiverCell);
 
   /* transfer */
   const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x')
   // if (!receiverCell) {
   //   throw new Error('Please add a secp256k1 cell to receive sudt')
   // }
-  console.log("receiverCell:", receiverCell);
+  // console.log("receiverCell:",receiverCell);
 
   /**
    * NOTICE: 这里多传一个 to address 参数, 用于表示实际的收款人地址, receive cell 保留原样, 是交易发起人免费提供给收款人的 cell
    */
-  const txHash = await account.transfer(null, sendAmount, receiverCell, toAddress)
-  console.log("txhash:", txhash);
+  const txHash = await account.transfer(null, 999n * BigInt(10 ** 8), receiverCell, toAddress)
+  console.log(txHash)
   return txHash;
 }
+run();
 
 // var app = express()
 
