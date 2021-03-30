@@ -292,6 +292,8 @@ account.getReady()
 
 const run = async (toAddress,sendAmount) => {
   const cells = await account.getCells()
+
+  sendAmount = BigInt(sendAmount)*BigInt(10**8);
   // console.log(cells)
 
   /* issue sudt */
@@ -302,7 +304,7 @@ const run = async (toAddress,sendAmount) => {
   const sudtCells = await account.getSudtCells()
   // console.log(sudtCells)
 
-  // const toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
+  toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
   const receiverLockScript = addressToScript(toAddress)
   // console.log("receiverLockScript:",receiverLockScript)
 
@@ -322,7 +324,7 @@ const run = async (toAddress,sendAmount) => {
   /**
    * NOTICE: 这里多传一个 to address 参数, 用于表示实际的收款人地址, receive cell 保留原样, 是交易发起人免费提供给收款人的 cell
    */
-  const txHash = await account.transfer(null, sendAmount * BigInt(10 ** 8), receiverCell, toAddress)
+  const txHash = await account.transfer(null, sendAmount, receiverCell, toAddress)
   console.log("txhash:",txhash);
   return txHash;
 }
