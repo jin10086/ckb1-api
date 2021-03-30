@@ -48,41 +48,6 @@ const CONFIG = {
 }
 
 
-const getCells = async (script, type) => {
-  let payload = {
-    id: 1,
-    jsonrpc: '2.0',
-    method: 'get_cells',
-    params: [
-      {
-        script: {
-          code_hash: script.codeHash,
-          hash_type: script.hashType,
-          args: script.args,
-        },
-        script_type: type,
-        // filter: filter,
-      },
-      'asc',
-      '0x200',
-    ],
-  }
-  const body = JSON.stringify(payload, null, '  ')
-  try {
-    let res = await fetch(CKB_NODE_INDEXER, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body,
-    })
-    res = await res.json()
-    return res.result.objects
-  } catch (error) {
-    console.error('error', error)
-  }
-}
-
 const CONSTANT = {
   sudtCellSize: 142 * 10 ** 8,
   acpCellSize: 61 * 10 ** 8,
@@ -287,7 +252,7 @@ const run = async () => {
   await account.getReady()
 
   const cells = await account.getCells()
-  console.log(cells)
+  // console.log(cells)
 
   /* issue sudt */
   // const txHash = await account.issue(2000000n * BigInt(10 ** 8))
@@ -299,15 +264,15 @@ const run = async () => {
 
   const toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
   const receiverLockScript = addressToScript(toAddress)
-  console.log("receiverLockScript:",receiverLockScript)
+  // console.log("receiverLockScript:",receiverLockScript)
 
   /**
    * NOTICE: 这里的 receive cell 通过发交易的人的 lock 去找, 因为发交易的人提供收款的 cell
    */
-  const allreceiverCell = await account.getCells();
+  // const allreceiverCell = await account.getCells();
 
   /* transfer */
-  const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x')
+  const receiverCell = cells.find(cell => !cell.type && cell.data === '0x')
   // if (!receiverCell) {
   //   throw new Error('Please add a secp256k1 cell to receive sudt')
   // }
