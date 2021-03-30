@@ -87,6 +87,7 @@ const CONSTANT = {
   sudtCellSize: 142 * 10 ** 8,
   acpCellSize: 61 * 10 ** 8,
 }
+const CAPACITY_TO_USER = BigInt(142);
 
 class SudtAccount {
   constructor(privateKey = CONFIG.privateKey, ckbUrl = CONFIG.ckbUrl) {
@@ -257,13 +258,22 @@ class SudtAccount {
     /**
      * NOTICE: 这里把实际收款人的 lock 放到交易的 output 中, 在原用例中是交易发起人接收这个 cell, 在这个例子中是 to address 接收这个 cell
      */
+
     const toLock = addressToScript(toAddress)
     rawTx.outputs.push({
       lock: toLock,
-      capacity: `0x${(BigInt(receiverCell.capacity) - fee).toString(16)}`,
+      capacity: `0x${CAPACITY_TO_USER.toString(16)}`,
       type: sudtTypeScript,
     })
     rawTx.witnesses.push('0x')
+
+    rawTx.outputs.push({
+      lock: this.sender.lock,
+      capacity: `0x${(BigInt(receiverCell.capacity) - CAPACITY_TO_USER - fee).toString(16)}`,
+      type: sudtTypeScript,
+    })
+    rawTx.witnesses.push('0x')
+
 
     const signedTx = this.ckb.signTransaction(this.sender.privateKey)(rawTx)
     return this.ckb.rpc.sendTransaction(signedTx)
