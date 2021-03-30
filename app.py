@@ -8,7 +8,7 @@ from redis import StrictRedis
 client = StrictRedis(decode_responses=True)
 
 parser = reqparse.RequestParser()
-parser.add_argument("tokencheck", type=str)
+parser.add_argument("checktoken", type=str)
 parser.add_argument("name", type=str)
 
 app = Flask(__name__)
