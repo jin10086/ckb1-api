@@ -336,7 +336,7 @@ app.get('/ckbsend',  asyncHandler(async(req, res) => {
     let sendAmount = req.query.sendAmount;
     // let txhash ="";
     // try {
-    let txhash = await run(toAddress,sendAmount);
+    let txhash = await run(toAddress,parseInt(sendAmount));
     // } catch (e) {
     //   let txhash = '';
 
