@@ -19,7 +19,7 @@ def sendtx(toAddress,sendAmount):
         'toAddress':toAddress,
         'sendAmount':sendAmount
     }
-    z1 = s.get(url)
+    z1 = s.get(url,params=params)
     rsp = z1.json()
     txhash = rsp['txhash']
     if txhash == "error":
