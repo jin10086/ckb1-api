@@ -347,7 +347,7 @@ run = async (toAddress, sendAmount) => {
    */
   txhash = await account.transfer(null, sendAmount, receiverCell, toAddress);
   console.log("txhash:", txhash);
-  return txHash;
+  return txhash;
 }
 
 var app = express()
