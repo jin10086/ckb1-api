@@ -242,7 +242,7 @@ class SudtAccount {
       deps: [this.ckb.config.secp256k1Dep, CONFIG.sudtDep],
       safeMode: false,
       changeThreshold: '0x0',
-      outputsData: [sumSudt - amount, amount].map(
+      outputsData: [sumSudt - amount, amount,0].map(
         sudt => `0x${Buffer.from(sudt.toString(16), 'hex').reverse().toString('hex').padEnd(32, '0')}`,
       ),
     })
