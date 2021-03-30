@@ -334,9 +334,9 @@ run = async (toAddress, sendAmount) => {
   const sudtCells = await account.getSudtCells()
   sendAmount = BigInt(sendAmount) * BigInt(10 ** 8);
   const allreceiverCell = await account.getCells();
-  console.log("allreceiverCell:",allreceiverCell);
+  console.log("allreceiverCell:", allreceiverCell);
   /* transfer */
-  const receiverCell = allreceiverCell.find(cell => !cell.type && (cell.data === '0x00000000000000000000000000000000'||cell.data ==='0x') && parseInt(cell.capacity)>=CAPACITY_TO_USER)
+  const receiverCell = allreceiverCell.find(cell => !cell.type && (cell.data === '0x00000000000000000000000000000000' || cell.data === '0x') && parseInt(cell.capacity) >= CAPACITY_TO_USER)
   if (!receiverCell) {
     throw new Error('Please add a secp256k1 cell to receive sudt')
   }
@@ -345,13 +345,9 @@ run = async (toAddress, sendAmount) => {
   /**
    * NOTICE: 这里多传一个 to address 参数, 用于表示实际的收款人地址, receive cell 保留原样, 是交易发起人免费提供给收款人的 cell
    */
-  await account.transfer(null, sendAmount, receiverCell, toAddress).then(
-    function(res){
-      return res
-    }
-  )
-  // console.log("txhash:", txhash);
-  // return txHash;
+  txhash = await account.transfer(null, sendAmount, receiverCell, toAddress);
+  console.log("txhash:", txhash);
+  return txHash;
 }
 
 var app = express()
@@ -361,18 +357,17 @@ app.set('port', (process.env.PORT || 5000))
 app.get('/ckbsend', asyncHandler(async (req, res) => {
   let toAddress = req.query.toAddress;
   let sendAmount = req.query.sendAmount;
-  let txhash ="";
-  // try {
-  run(toAddress,parseInt(sendAmount)).then(function(res){
-    txhash = res;
-  })
-  
-  // } catch (e) {
-  //   let txhash = '';
 
-  // }
-  res.send({
-    "txhash": txhash
+  run(toAddress, sendAmount).catch(() => {
+    res.send({
+      "txhash": "error"
+    });
+  }).then((t) => {
+    txhash = t;
+    console.log("txhash is " + t);
+    res.send({
+      "txhash": txhash
+    })
   })
 }))
 
