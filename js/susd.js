@@ -336,7 +336,7 @@ run = async (toAddress, sendAmount) => {
   const allreceiverCell = await account.getCells();
   console.log("allreceiverCell:",allreceiverCell);
   /* transfer */
-  const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x' && parseInt(cell.capacity)>15000000000)
+  const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x00000000000000000000000000000000' && parseInt(cell.capacity)>15000000000)
   if (!receiverCell) {
     throw new Error('Please add a secp256k1 cell to receive sudt')
   }
@@ -345,9 +345,13 @@ run = async (toAddress, sendAmount) => {
   /**
    * NOTICE: 这里多传一个 to address 参数, 用于表示实际的收款人地址, receive cell 保留原样, 是交易发起人免费提供给收款人的 cell
    */
-  const txHash = await account.transfer(null, sendAmount, receiverCell, toAddress)
-  console.log("txhash:", txhash);
-  return txHash;
+  await account.transfer(null, sendAmount, receiverCell, toAddress).then(
+    function(res){
+      return res
+    }
+  )
+  // console.log("txhash:", txhash);
+  // return txHash;
 }
 
 var app = express()
