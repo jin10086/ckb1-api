@@ -8,24 +8,33 @@ const express = require('express')
 const asyncHandler = require('express-async-handler')
 
 
-const { getTransactionSize, addressToScript } = require('@nervosnetwork/ckb-sdk-utils')
+const {
+  getTransactionSize,
+  addressToScript
+} = require('@nervosnetwork/ckb-sdk-utils')
 
 
 /* eslint-disable-next-line */
-const { Indexer, CellCollector } = require('@ckb-lumos/indexer')
-const { SIMPLE_UDT, ANYONE_CAN_PAY_TESTNET } = require('@nervosnetwork/ckb-sdk-utils/lib/systemScripts')
+const {
+  Indexer,
+  CellCollector
+} = require('@ckb-lumos/indexer')
+const {
+  SIMPLE_UDT,
+  ANYONE_CAN_PAY_TESTNET
+} = require('@nervosnetwork/ckb-sdk-utils/lib/systemScripts')
 const CKB = require('@nervosnetwork/ckb-sdk-core').default
 
 const CKB_NODE_INDEXER = "https://testnet.ckb.dev/indexer"
 
 const httpAgent = new http.Agent({
- keepAlive: true
+  keepAlive: true
 });
 const httpsAgent = new https.Agent({
- keepAlive: true
+  keepAlive: true
 });
 
-const agent = function(_parsedURL) {
+const agent = function (_parsedURL) {
   if (_parsedURL.protocol == 'http:') {
     return httpAgent;
   } else {
@@ -57,8 +66,7 @@ const getCells = async (script, type) => {
     id: 1,
     jsonrpc: '2.0',
     method: 'get_cells',
-    params: [
-      {
+    params: [{
         script: {
           code_hash: script.codeHash,
           hash_type: script.hashType,
@@ -91,13 +99,17 @@ const CONSTANT = {
   sudtCellSize: 142 * 10 ** 8,
   acpCellSize: 61 * 10 ** 8,
 }
-const CAPACITY_TO_USER = BigInt(142*(10 ** 8));
+const CAPACITY_TO_USER = BigInt(142 * (10 ** 8));
 
 class SudtAccount {
   constructor(privateKey = CONFIG.privateKey, ckbUrl = CONFIG.ckbUrl) {
     this.ckb = new CKB(ckbUrl)
     const uri = "http://localhost:8114";
-    this.indexer = new Indexer(uri, path.join('.', CONFIG.lumosDbName),{ rpcOptions: { agent: agent(new URL(uri))}});
+    this.indexer = new Indexer(uri, path.join('.', CONFIG.lumosDbName), {
+      rpcOptions: {
+        agent: agent(new URL(uri))
+      }
+    });
     console.log("indexer working...");
     this.indexer.startForever()
 
@@ -106,7 +118,11 @@ class SudtAccount {
 
     const publicKeyHash = `0x${this.ckb.utils.blake160(publicKey, 'hex')}`
 
-    this.sender = { privateKey, publicKey, publicKeyHash }
+    this.sender = {
+      privateKey,
+      publicKey,
+      publicKeyHash
+    }
   }
 
   getReady = async () => {
@@ -119,11 +135,21 @@ class SudtAccount {
   }
 
   getCells = async () => {
-    await this.ckb.loadCells({ indexer: this.indexer, CellCollector, lock: this.sender.lock, save: true })
+    await this.ckb.loadCells({
+      indexer: this.indexer,
+      CellCollector,
+      lock: this.sender.lock,
+      save: true
+    })
     return this.ckb.cells.get(this.ckb.utils.scriptToHash(this.sender.lock))
   }
   getOtherCells = async lockscript => {
-    await this.ckb.loadCells({ indexer: this.indexer, CellCollector, lock: lockscript, save: true })
+    await this.ckb.loadCells({
+      indexer: this.indexer,
+      CellCollector,
+      lock: lockscript,
+      save: true
+    })
     return this.ckb.cells.get(this.ckb.utils.scriptToHash(lockscript))
   }
   getSudtCells = async tokenId => {
@@ -142,7 +168,11 @@ class SudtAccount {
     })
     /* eslint-disable-next-line */
     for await (const {
-      cell_output: { lock, type, capacity },
+      cell_output: {
+        lock,
+        type,
+        capacity
+      },
       out_point,
       data,
     } of collector.collect()) {
@@ -170,7 +200,9 @@ class SudtAccount {
   }
 
   createAcpCell = async amount => {
-    const address = this.ckb.utils.privateKeyToAddress(this.sender.privateKey, { prefix: 'ckt' })
+    const address = this.ckb.utils.privateKeyToAddress(this.sender.privateKey, {
+      prefix: 'ckt'
+    })
     const rawTx = this.ckb.generateRawTransaction({
       fromAddress: address,
       toAddress: address,
@@ -189,7 +221,9 @@ class SudtAccount {
   }
 
   issue = async (amount) => {
-    const address = this.ckb.utils.privateKeyToAddress(this.sender.privateKey, { prefix: 'ckt' })
+    const address = this.ckb.utils.privateKeyToAddress(this.sender.privateKey, {
+      prefix: 'ckt'
+    })
     const rawTx = this.ckb.generateRawTransaction({
       fromAddress: address,
       toAddress: address,
@@ -233,7 +267,9 @@ class SudtAccount {
       throw new Error(`This account has ${sumSudt} sudt, which is not enough for a transaction of amount ${amount}`)
     }
 
-    const address = this.ckb.utils.privateKeyToAddress(this.sender.privateKey, { prefix: 'ckt' })
+    const address = this.ckb.utils.privateKeyToAddress(this.sender.privateKey, {
+      prefix: 'ckt'
+    })
 
     const sudtTypeScript = inputs[0].type
 
@@ -243,11 +279,14 @@ class SudtAccount {
       toAddress: address,
       capacity: `0x${inputs.reduce((sum, i) => sum + i.capacity, 0n).toString(16)}`,
       fee: 0n,
-      cells: inputs.map(input => ({ ...input, capacity: `0x${input.capacity.toString(16)}` })),
+      cells: inputs.map(input => ({
+        ...input,
+        capacity: `0x${input.capacity.toString(16)}`
+      })),
       deps: [this.ckb.config.secp256k1Dep, CONFIG.sudtDep],
       safeMode: false,
       changeThreshold: '0x0',
-      outputsData: [sumSudt - amount, amount,0].map(
+      outputsData: [sumSudt - amount, amount, 0].map(
         sudt => `0x${Buffer.from(sudt.toString(16), 'hex').reverse().toString('hex').padEnd(32, '0')}`,
       ),
     })
@@ -290,17 +329,17 @@ module.exports = SudtAccount
 const account = new SudtAccount()
 account.getReady()
 
-const run = async (toAddress,sendAmount) => {
+const run = async (toAddress, sendAmount) => {
   const cells = await account.getCells()
 
-  sendAmount = BigInt(sendAmount)*BigInt(10**8);
+  sendAmount = BigInt(sendAmount) * BigInt(10 ** 8);
   // console.log(cells)
 
   /* issue sudt */
   // const txHash = await account.issue(2000000n * BigInt(10 ** 8))
   // console.log(txHash)
 
-//   /* get sudt cells */
+  //   /* get sudt cells */
   const sudtCells = await account.getSudtCells()
   // console.log(sudtCells)
 
@@ -319,13 +358,13 @@ const run = async (toAddress,sendAmount) => {
   // if (!receiverCell) {
   //   throw new Error('Please add a secp256k1 cell to receive sudt')
   // }
-  console.log("receiverCell:",receiverCell);
+  console.log("receiverCell:", receiverCell);
 
   /**
    * NOTICE: 这里多传一个 to address 参数, 用于表示实际的收款人地址, receive cell 保留原样, 是交易发起人免费提供给收款人的 cell
    */
   const txHash = await account.transfer(null, sendAmount, receiverCell, toAddress)
-  console.log("txhash:",txhash);
+  console.log("txhash:", txhash);
   return txHash;
 }
 
@@ -333,21 +372,21 @@ var app = express()
 
 app.set('port', (process.env.PORT || 5000))
 
-app.get('/ckbsend',  asyncHandler(async(req, res) => {
-    let toAddress = req.query.toAddress;
-    let sendAmount = req.query.sendAmount;
-    // let txhash ="";
-    // try {
-    let txhash = await run(toAddress,parseInt(sendAmount));
-    // } catch (e) {
-    //   let txhash = '';
+app.get('/ckbsend', asyncHandler(async (req, res) => {
+  let toAddress = req.query.toAddress;
+  let sendAmount = req.query.sendAmount;
+  // let txhash ="";
+  // try {
+  let txhash = await run(toAddress, parseInt(sendAmount));
+  // } catch (e) {
+  //   let txhash = '';
 
-    // }
-    res.send({
-        "txhash": txhash
-    })
+  // }
+  res.send({
+    "txhash": txhash
+  })
 }))
 
 app.listen(app.get('port'), function () {
-    console.log("Node app is running at localhost:" + app.get('port'))
+  console.log("Node app is running at localhost:" + app.get('port'))
 })
