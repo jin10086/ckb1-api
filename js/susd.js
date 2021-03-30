@@ -322,7 +322,7 @@ const run = async (toAddress,sendAmount) => {
    * NOTICE: 这里多传一个 to address 参数, 用于表示实际的收款人地址, receive cell 保留原样, 是交易发起人免费提供给收款人的 cell
    */
   const txHash = await account.transfer(null, BigInt(sendAmount) * BigInt(10 ** 8), receiverCell, toAddress)
-  console.log(txhash)
+  console.log("txhash:",txhash);
   return txHash;
 }
 
@@ -333,12 +333,13 @@ app.set('port', (process.env.PORT || 5000))
 app.get('/ckbsend',  asyncHandler(async(req, res) => {
     let toAddress = req.query.toAddress;
     let sendAmount = req.query.sendAmount;
-    let txhash ="";
-    try {
-      txhash = await run(toAddress,sendAmount);
-    } catch (e) {
+    // let txhash ="";
+    // try {
+    let txhash = await run(toAddress,sendAmount);
+    // } catch (e) {
+    //   let txhash = '';
 
-    }
+    // }
     res.send({
         "txhash": txhash
     })
