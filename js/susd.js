@@ -358,17 +358,13 @@ app.get('/ckbsend', function (req, res) {
   let toAddress = req.query.toAddress;
   let sendAmount = req.query.sendAmount;
 
-  run(toAddress, parseInt(sendAmount)).catch(() => {
-    res.send({
-      "txhash": "error"
-    });
-  }).then((t) => {
+  run(toAddress, sendAmount).then((t) => {
     txhash = t;
-    console.log("txhash is " + t);
+    console.log("txhash is "+t);
     res.send({
-      "txhash": txhash
-    })
-  })
+        "txhash": txhash
+    });
+  }).catch(() => {res.send({"txhash":"error"}); return ;})
 })
 
 app.listen(app.get('port'), function () {
