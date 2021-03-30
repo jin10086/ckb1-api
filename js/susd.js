@@ -330,8 +330,8 @@ const account = new SudtAccount()
 
 run = async (toAddress, sendAmount) => {
   await account.getReady()
-  const cells = await account.getCells()
 
+  const cells = await account.getCells()
   sendAmount = BigInt(sendAmount) * BigInt(10 ** 8);
   // console.log(cells)
 
@@ -340,21 +340,18 @@ run = async (toAddress, sendAmount) => {
   // console.log(txHash)
 
   //   /* get sudt cells */
-  const sudtCells = await account.getSudtCells()
+  // const sudtCells = await account.getSudtCells()
   // console.log(sudtCells)
 
-  toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
-  const receiverLockScript = addressToScript(toAddress)
-  // console.log("receiverLockScript:",receiverLockScript)
+  // toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
 
   /**
    * NOTICE: 这里的 receive cell 通过发交易的人的 lock 去找, 因为发交易的人提供收款的 cell
    */
-  const allreceiverCell = await account.getCells();
-  // console.log(allreceiverCell);
+   const cells = await account.getCells()
 
   /* transfer */
-  const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x' && parseInt(cell.capacity)>15000000000)
+  const receiverCell = cells.find(cell => !cell.type && cell.data === '0x' && parseInt(cell.capacity)>15000000000)
   // if (!receiverCell) {
   //   throw new Error('Please add a secp256k1 cell to receive sudt')
   // }
@@ -375,9 +372,12 @@ app.set('port', (process.env.PORT || 5000))
 app.get('/ckbsend', asyncHandler(async (req, res) => {
   let toAddress = req.query.toAddress;
   let sendAmount = req.query.sendAmount;
-  // let txhash ="";
+  let txhash ="";
   // try {
-  let txhash = await run(toAddress, parseInt(sendAmount));
+  run(toAddress,parseInt(sendAmount)).then(function(res){
+    txhash = res;
+  })
+  
   // } catch (e) {
   //   let txhash = '';
 
