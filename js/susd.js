@@ -331,30 +331,13 @@ const account = new SudtAccount()
 run = async (toAddress, sendAmount) => {
   await account.getReady()
 
-  const cells = await account.getCells()
   sendAmount = BigInt(sendAmount) * BigInt(10 ** 8);
-  // console.log(cells)
-
-  /* issue sudt */
-  // const txHash = await account.issue(2000000n * BigInt(10 ** 8))
-  // console.log(txHash)
-
-  //   /* get sudt cells */
-  // const sudtCells = await account.getSudtCells()
-  // console.log(sudtCells)
-
-  // toAddress = "ckt1qyqfw8fp90455dyvv4cdsnqalgfvhhxq2jesxlrvzs";
-
-  /**
-   * NOTICE: 这里的 receive cell 通过发交易的人的 lock 去找, 因为发交易的人提供收款的 cell
-   */
-   const cells = await account.getCells()
-
+  const cells = await account.getCells()
   /* transfer */
   const receiverCell = cells.find(cell => !cell.type && cell.data === '0x' && parseInt(cell.capacity)>15000000000)
-  // if (!receiverCell) {
-  //   throw new Error('Please add a secp256k1 cell to receive sudt')
-  // }
+  if (!receiverCell) {
+    throw new Error('Please add a secp256k1 cell to receive sudt')
+  }
   console.log("receiverCell:", receiverCell);
 
   /**
