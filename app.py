@@ -2,6 +2,8 @@ from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 import random, hashlib, json
 from flask_pymongo import PyMongo
+from flask_cors import CORS
+
 
 from redis import StrictRedis
 
@@ -15,6 +17,7 @@ app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
 api = Api(app)
 mongo = PyMongo(app)
+CORS(app)
 
 
 todos = {}
