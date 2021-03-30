@@ -354,11 +354,11 @@ var app = express()
 
 app.set('port', (process.env.PORT || 5000))
 
-app.get('/ckbsend', asyncHandler(async (req, res) => {
+app.get('/ckbsend', function (req, res) {
   let toAddress = req.query.toAddress;
   let sendAmount = req.query.sendAmount;
 
-  run(toAddress, sendAmount).catch(() => {
+  run(toAddress, parseInt(sendAmount)).catch(() => {
     res.send({
       "txhash": "error"
     });
@@ -369,7 +369,7 @@ app.get('/ckbsend', asyncHandler(async (req, res) => {
       "txhash": txhash
     })
   })
-}))
+})
 
 app.listen(app.get('port'), function () {
   console.log("Node app is running at localhost:" + app.get('port'))
