@@ -334,7 +334,7 @@ run = async (toAddress, sendAmount) => {
   const sudtCells = await account.getSudtCells()
   sendAmount = BigInt(sendAmount) * BigInt(10 ** 8);
   const allreceiverCell = await account.getCells();
-  console.log(allreceiverCell);
+  console.log("allreceiverCell:",allreceiverCell);
   /* transfer */
   const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x' && parseInt(cell.capacity)>15000000000)
   if (!receiverCell) {
