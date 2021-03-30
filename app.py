@@ -70,7 +70,7 @@ class CKBApi(Resource):
         return {"status": 1, "name": name, "amount": amount}
 
 
-api.add_resource(CKBApi, "/address/<string:address>")
+api.add_resource(CKBApi, "/gettoken/<string:address>")
 
 if __name__ == "__main__":
     app.run(debug=True,port=8000)
