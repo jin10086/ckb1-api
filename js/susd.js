@@ -360,11 +360,17 @@ app.get('/ckbsend', function (req, res) {
 
   run(toAddress, sendAmount).then((t) => {
     txhash = t;
-    console.log("txhash is "+t);
+    console.log("txhash is " + t);
     res.send({
-        "txhash": txhash
+      "txhash": txhash
     });
-  }).catch(() => {res.send({"txhash":"error"}); return ;})
+  }).catch((err) => {
+    console.log(err);
+    res.send({
+      "txhash": "error"
+    });
+    return;
+  })
 })
 
 app.listen(app.get('port'), function () {
