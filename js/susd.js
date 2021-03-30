@@ -87,7 +87,7 @@ const CONSTANT = {
   sudtCellSize: 142 * 10 ** 8,
   acpCellSize: 61 * 10 ** 8,
 }
-const CAPACITY_TO_USER = BigInt(142);
+const CAPACITY_TO_USER = BigInt(142*(10 ** 8));
 
 class SudtAccount {
   constructor(privateKey = CONFIG.privateKey, ckbUrl = CONFIG.ckbUrl) {
