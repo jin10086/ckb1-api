@@ -332,9 +332,9 @@ run = async (toAddress, sendAmount) => {
   await account.getReady()
 
   sendAmount = BigInt(sendAmount) * BigInt(10 ** 8);
-  const cells = await account.getCells()
+  const allreceiverCell = await account.getCells();
   /* transfer */
-  const receiverCell = cells.find(cell => !cell.type && cell.data === '0x' && parseInt(cell.capacity)>15000000000)
+  const receiverCell = allreceiverCell.find(cell => !cell.type && cell.data === '0x' && parseInt(cell.capacity)>15000000000)
   if (!receiverCell) {
     throw new Error('Please add a secp256k1 cell to receive sudt')
   }
