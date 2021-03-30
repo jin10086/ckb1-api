@@ -3,6 +3,9 @@ from flask_restful import Resource, Api, reqparse
 import random,hashlib,json
 from flask_pymongo import PyMongo
 
+from redis import StrictRedis
+client = StrictRedis(decode_responses=True)
+
 parser = reqparse.RequestParser()
 parser.add_argument("token", type=str)
 parser.add_argument("name", type=str)
@@ -37,15 +40,18 @@ class CKBApi(Resource):
         user = mongo.db.users.find_one({"address": address})
         if not user:
             return {"status": 0, "msg": "address not found"}
-
-        return {"status": 1, "name": user["name"], "amount": user["amount"]}
+        if user.get('tx'):
+            tx = user['tx']
+        else:
+            tx = ''
+        return {"status": 1, "name": user["name"], "amount": user["amount"],'txhash':tx}
 
     def post(self, address):
         args = parser.parse_args()
         name = args["name"]
-        token = args["token"]
+        checktoken = args["checktoken"]
 
-        if not verifyToken(token,address,name):
+        if not verifyToken(checktoken,address,name):
             return {
                 {"status": 0, "msg": "参数校验失败."}
             }
@@ -53,7 +59,11 @@ class CKBApi(Resource):
         if user:
             return {"status": 0, "msg": "代币已经发过了."}
         amount = getTokenAmount()
-        #TODO: send
+        #TODO: 添加到redis队列.队列按照顺序处理.
+        client.lpush('sendtoken',json.dumps(
+            {'address':address,
+            'amount':amount}
+        ))
         user = {"address": address, "name": name, "amount": amount}
         mongo.db.users.insert_one(user)
         return {"status": 1, "name": name, "amount": amount}
