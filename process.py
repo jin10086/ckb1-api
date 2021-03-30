@@ -1,9 +1,12 @@
+from pymongo.message import _CursorAddress
 from redis import StrictRedis
 import requests
 import json
 import time
 from loguru import logger
+from pymongo import MongoClient
 
+db = MongoClient()['myDatabase']['users']
 s = requests.Session()
 client = StrictRedis(decode_responses=True)
 
@@ -35,6 +38,10 @@ def do():
         txhash = sendtx(waitsend["address"], waitsend["amount"])
         if txhash:
             logger.info(f"代币发送成功,txhash:{txhash}")
+            db.find_one_and_update(
+                {'address':waitsend["address"]},
+                { '$set': { "tx" : txhash}}
+            )
         else:
             logger.error(f"代币发送失败,重新给他丢回队列")
             client.lpush("sendtoken", json.dumps(waitsend))
