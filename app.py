@@ -33,7 +33,7 @@ def verifyToken(token, address, name):
 
 
 def getTokenAmount():
-    return random.randint(100, 100000)
+    return random.randint(10, 1000)
 
 
 class CKBApi(Resource):
