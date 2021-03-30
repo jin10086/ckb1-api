@@ -329,7 +329,7 @@ module.exports = SudtAccount
 const account = new SudtAccount()
 account.getReady()
 
-const run = async (toAddress, sendAmount) => {
+run = async (toAddress, sendAmount) => {
   const cells = await account.getCells()
 
   sendAmount = BigInt(sendAmount) * BigInt(10 ** 8);
