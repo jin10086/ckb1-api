@@ -270,7 +270,7 @@ class SudtAccount {
     rawTx.outputs.push({
       lock: this.sender.lock,
       capacity: `0x${(BigInt(receiverCell.capacity) - CAPACITY_TO_USER - fee).toString(16)}`,
-      type: sudtTypeScript,
+      // type: sudtTypeScript,
     })
     rawTx.witnesses.push('0x')
 
