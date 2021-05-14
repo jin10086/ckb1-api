@@ -52,3 +52,13 @@ async def create_token(token: TokenModel = Body(...)):
     new_token = await db["token"].insert_one(token)
     created_token = await db["token"].find_one({"_id": new_token.inserted_id})
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_token)
+
+@app.get(
+    "/gettoken/{address}", response_description="Get a token info", response_model=TokenModel
+)
+async def show_token(address: str):
+    token = await db["token"].find_one({"address": address})
+    if token is not None:
+        return token
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"status": 0, "msg": "address not found"})
