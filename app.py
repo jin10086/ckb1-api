@@ -1,79 +1,54 @@
-from flask import Flask, request
-from flask_restful import Resource, Api, reqparse
-import random, hashlib, json
-from flask_pymongo import PyMongo
-from flask_cors import CORS
+import os
+from fastapi import FastAPI, Body, HTTPException, status
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel, Field
+from bson import ObjectId
+from typing import Optional, List
+import motor.motor_asyncio
+
+app = FastAPI()
+client = motor.motor_asyncio.AsyncIOMotorClient()
+db = client.college
 
 
-from redis import StrictRedis
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
 
-client = StrictRedis(decode_responses=True)
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid objectid")
+        return ObjectId(v)
 
-parser = reqparse.RequestParser()
-parser.add_argument("checktoken", type=str)
-parser.add_argument("name", type=str)
-
-app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
-api = Api(app)
-mongo = PyMongo(app)
-CORS(app)
-
-
-todos = {}
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type="string")
 
 
-def verifyToken(token, address, name):
-    data = f"address:{address},name:{name}"
+class TokenModel(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    name: str = Field(...)
+    address: str = Field(...)
 
-    # address = 'ckb1qyqz8j38uju4l93wfhtxrra4l4uu7uqqvktsj9wh0j'
-    # name = '测试1'
-    # 等待hash的参数.
-    # 'address:ckb1qyqz8j38uju4l93wfhtxrra4l4uu7uqqvktsj9wh0j,name:测试1'
-
-    # hash: 'eaa49aa14b58f3f842f9941df638bbd8f4079e68c2bbf73f913a0365701c4107'
-    return token == hashlib.sha256(data.encode()).hexdigest()
-
-
-def getTokenAmount():
-    return random.randint(10, 1000)
-
-
-class CKBApi(Resource):
-    def get(self, address):
-        user = mongo.db.users.find_one({"address": address})
-        if not user:
-            return {"status": 0, "msg": "address not found"}
-        if user.get("tx"):
-            tx = user["tx"]
-        else:
-            tx = ""
-        return {
-            "status": 1,
-            "name": user["name"],
-            "amount": user["amount"],
-            "txhash": tx,
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "name": "Jane Doe",
+                "address": "ckt1qyqyqg9gehfs8ymc95vttuhh6qdp6m8x25sq8wldnk",
+            }
         }
 
-    def post(self, address):
-        args = parser.parse_args()
-        name = args["name"]
-        checktoken = args["checktoken"]
 
-        # if not verifyToken(checktoken, address, name):
-        #     return {{"status": 0, "msg": "参数校验失败."}}
-        user = mongo.db.users.find_one({"address": address})
-        if user:
-            return {"status": 0, "msg": "代币已经发过了."}
-        amount = getTokenAmount()
-        # TODO: 添加到redis队列.队列按照顺序处理.
-        client.lpush("sendtoken", json.dumps({"address": address, "amount": amount}))
-        user = {"address": address, "name": name, "amount": amount}
-        mongo.db.users.insert_one(user)
-        return {"status": 1, "name": name, "amount": amount}
-
-
-api.add_resource(CKBApi, "/gettoken/<string:address>")
-
-if __name__ == "__main__":
-    app.run(debug=False,port=8000,host='0.0.0.0')
+@app.post("/create_token", response_description="Add new token", response_model=TokenModel)
+async def create_token(token: TokenModel = Body(...)):
+    token = jsonable_encoder(token)
+    token['amount'] = 100000000
+    new_token = await db["token"].insert_one(token)
+    created_token = await db["token"].find_one({"_id": new_token.inserted_id})
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_token)
