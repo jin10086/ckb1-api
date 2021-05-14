@@ -51,7 +51,8 @@ async def create_token(token: TokenModel = Body(...)):
     token['amount'] = 100000000
     new_token = await db["token"].insert_one(token)
     created_token = await db["token"].find_one({"_id": new_token.inserted_id})
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_token)
+    ret = { "status": 1, "name": created_token['name'], "amount": created_token['amount'], "txhash": "", }
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=ret)
 
 @app.get(
     "/gettoken/{address}", response_description="Get a token info", response_model=TokenModel
