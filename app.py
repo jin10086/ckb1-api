@@ -2,6 +2,8 @@ import os
 from fastapi import FastAPI, Body, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
+
 from pydantic import BaseModel, Field
 from bson import ObjectId
 from typing import Optional, List
@@ -10,6 +12,14 @@ import motor.motor_asyncio
 app = FastAPI()
 client = motor.motor_asyncio.AsyncIOMotorClient()
 db = client.college
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class PyObjectId(ObjectId):
