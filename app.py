@@ -45,7 +45,7 @@ class TokenModel(BaseModel):
         }
 
 
-@app.post("/create_token", response_description="Add new token", response_model=TokenModel)
+@app.post("/api/create_token", response_description="Add new token", response_model=TokenModel)
 async def create_token(token: TokenModel = Body(...)):
     token = jsonable_encoder(token)
     token['amount'] = 100000000
@@ -55,7 +55,7 @@ async def create_token(token: TokenModel = Body(...)):
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=ret)
 
 @app.get(
-    "/gettoken/{address}", response_description="Get a token info", response_model=TokenModel
+    "/api/gettoken/{address}", response_description="Get a token info", response_model=TokenModel
 )
 async def show_token(address: str):
     token = await db["token"].find_one({"address": address})
